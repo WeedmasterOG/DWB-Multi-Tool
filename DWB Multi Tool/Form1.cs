@@ -5,7 +5,6 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Windows.Forms;
-using MetroFramework;
 
 namespace DWB_Multi_Tool
 {
@@ -18,10 +17,7 @@ namespace DWB_Multi_Tool
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            MessageBox.Show("DWB Multi Tool made by Kevin AKA WeedmasterOG(anyone else giving this tool out isnt the maker)\n\n" +
-            "Contact Info\nSkype: kevinab1234\nDiscord: Kevin#9176\n\nIv been working a good bit on this so be sure to leave " +
-            "commands/feedback on the thread, much appreciated :)", "DWB Multi Tool", MessageBoxButtons.OK, MessageBoxIcon.None,
-            MessageBoxDefaultButton.Button1);
+
         }
 
         private void metroButton1_Click(object sender, EventArgs e)
