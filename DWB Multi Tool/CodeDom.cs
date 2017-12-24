@@ -31,8 +31,11 @@ namespace DWB_Multi_Tool
                 FileSources.AssemblyInfo = FileSources.AssemblyInfo.Replace(AsmInfoReplace[i], AssemblyInfo[i]);
             }
 
-            // Create AssemblyInfo.cs file
-            File.WriteAllText("AssemblyInfo.cs", FileSources.AssemblyInfo);
+            if (!File.Exists("AssemblyInfo.cs"))
+            {
+                // Create AssemblyInfo.cs file
+                File.WriteAllText("AssemblyInfo.cs", FileSources.AssemblyInfo);
+            }
 
             // Set compiler parameters
             parameters.CompilerOptions = "/target:winexe /optimize AssemblyInfo.cs";
@@ -58,8 +61,11 @@ namespace DWB_Multi_Tool
             // Check if user wants Uac
             if (Uac == true)
             {
-                // Create app.manifest file
-                File.WriteAllText("app.manifest", FileSources.ManifestFile);
+                if (!File.Exists("app.manifest"))
+                {
+                    // Create app.manifest file
+                    File.WriteAllText("app.manifest", FileSources.ManifestFile);
+                }
 
                 // Add manifest file to the compiler parameters
                 parameters.CompilerOptions += @" /win32manifest:" + "app.manifest";
@@ -98,32 +104,32 @@ namespace DWB_Multi_Tool
         {
             // AssemblyInfo file source
             public static string AssemblyInfo = @"using System.Reflection;
-            using System.Runtime.CompilerServices;
-            using System.Runtime.InteropServices;
-            [assembly: AssemblyTitle(""%TITLE%"")]
-            [assembly: AssemblyDescription(""%DESCRIPTION%"")]
-            [assembly: AssemblyCompany(""%COMPANY%"")]
-            [assembly: AssemblyProduct(""%PRODUCT%"")]
-            [assembly: AssemblyCopyright(""%COPYRIGHT%"")]
-            [assembly: AssemblyTrademark(""%TRADEMARK%"")]
-            [assembly: AssemblyFileVersion(""1.0.0.0"")]";
+        using System.Runtime.CompilerServices;
+        using System.Runtime.InteropServices;
+        [assembly: AssemblyTitle(""%TITLE%"")]
+        [assembly: AssemblyDescription(""%DESCRIPTION%"")]
+        [assembly: AssemblyCompany(""%COMPANY%"")]
+        [assembly: AssemblyProduct(""%PRODUCT%"")]
+        [assembly: AssemblyCopyright(""%COPYRIGHT%"")]
+        [assembly: AssemblyTrademark(""%TRADEMARK%"")]
+        [assembly: AssemblyFileVersion(""1.0.0.0"")]";
 
             // Manifest file source
             public static string ManifestFile = @"<?xml version=""1.0"" encoding=""utf-8""?>
-            <assembly manifestVersion=""1.0"" xmlns=""urn:schemas-microsoft-com:asm.v1"">
-            <assemblyIdentity version=""1.0.0.0"" name=""MyApplication.app""/>
-            <trustInfo xmlns=""urn:schemas-microsoft-com:asm.v2"">
-            <security>
-            <requestedPrivileges xmlns=""urn:schemas-microsoft-com:asm.v3"">
-            <requestedExecutionLevel level=""requireAdministrator"" uiAccess=""false""/>
-            </requestedPrivileges>
-            </security>
-            </trustInfo>
-            <compatibility xmlns=""urn:schemas-microsoft-com:compatibility.v1"">
-            <application>
-            </application>
-            </compatibility>
-            </assembly>";
+        <assembly manifestVersion=""1.0"" xmlns=""urn:schemas-microsoft-com:asm.v1"">
+        <assemblyIdentity version=""1.0.0.0"" name=""MyApplication.app""/>
+        <trustInfo xmlns=""urn:schemas-microsoft-com:asm.v2"">
+        <security>
+        <requestedPrivileges xmlns=""urn:schemas-microsoft-com:asm.v3"">
+        <requestedExecutionLevel level=""requireAdministrator"" uiAccess=""false""/>
+        </requestedPrivileges>
+        </security>
+        </trustInfo>
+        <compatibility xmlns=""urn:schemas-microsoft-com:compatibility.v1"">
+        <application>
+        </application>
+        </compatibility>
+        </assembly>";
         }
     }
 }
