@@ -31,6 +31,7 @@ namespace DWB_Multi_Tool
                 FileSources.AssemblyInfo = FileSources.AssemblyInfo.Replace(AsmInfoReplace[i], AssemblyInfo[i]);
             }
 
+            // Check if file exists
             if (!File.Exists("AssemblyInfo.cs"))
             {
                 // Create AssemblyInfo.cs file
@@ -61,6 +62,7 @@ namespace DWB_Multi_Tool
             // Check if user wants Uac
             if (Uac == true)
             {
+                // Check if file exists
                 if (!File.Exists("app.manifest"))
                 {
                     // Create app.manifest file
